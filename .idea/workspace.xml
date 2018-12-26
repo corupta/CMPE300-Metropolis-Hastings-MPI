@@ -14,6 +14,7 @@
       <change beforePath="$PROJECT_DIR$/denoiser" beforeDir="false" afterPath="$PROJECT_DIR$/denoiser" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/denoiser.c" beforeDir="false" afterPath="$PROJECT_DIR$/denoiser.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/denoiser.dSYM/Contents/Resources/DWARF/denoiser" beforeDir="false" afterPath="$PROJECT_DIR$/denoiser.dSYM/Contents/Resources/DWARF/denoiser" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input-output.zip" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/input-output/lena_output.txt" beforeDir="false" afterPath="$PROJECT_DIR$/input-output/lena_output.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -29,8 +30,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/denoiser.c">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="210">
-                  <caret line="14" column="33" selection-start-line="14" selection-start-column="33" selection-end-line="14" selection-end-column="33" />
+                <state relative-caret-position="195">
+                  <caret line="13" column="17" lean-forward="true" selection-start-line="13" selection-start-column="17" selection-end-line="13" selection-end-column="17" />
                 </state>
               </provider>
             </entry>
@@ -42,8 +43,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/denoiser.c">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="187">
-                  <caret line="441" column="33" selection-start-line="441" selection-start-column="33" selection-end-line="441" selection-end-column="33" />
+                <state relative-caret-position="72">
+                  <caret line="449" column="33" selection-start-line="449" selection-start-column="33" selection-end-line="449" selection-end-column="33" />
                 </state>
               </provider>
             </entry>
@@ -54,16 +55,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>answerResponses[di</find>
-      <find>Wait</find>
-      <find>askRequestCount</find>
-      <find>&amp;askResponseCount,</find>
-      <find>Count</find>
-      <find>askResponseCount</find>
-      <find>askReqResCount</find>
-      <find>askRequestCou</find>
-      <find>summer</find>
-      <find>gamma</find>
       <find>char**</find>
       <find>subI</find>
       <find>char*[][]</find>
@@ -84,6 +75,16 @@
       <find>finishedCount</find>
       <find>MPI_REQU`</find>
       <find>MPI_REQUEST</find>
+      <find>made a</find>
+      <find>delta</find>
+      <find>selecte</find>
+      <find>printf</find>
+      <find>slave coun</find>
+      <find>world_size -1</find>
+      <find>running</find>
+      <find>runn</find>
+      <find>row</find>
+      <find>rowCount</find>
     </findStrings>
     <replaceStrings>
       <replace>askResponseCounts</replace>
@@ -134,6 +135,11 @@
               <item name="programming-project" type="462c0819:PsiDirectoryNode" />
               <item name="input-output" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="programming-project" type="b2602c69:ProjectViewProjectNode" />
+              <item name="programming-project" type="462c0819:PsiDirectoryNode" />
+              <item name="scripts" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -143,6 +149,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_package_manager_path" value="npm" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -176,12 +183,14 @@
       <updated>1545755417458</updated>
       <workItem from="1545755419780" duration="1991000" />
       <workItem from="1545798152225" duration="17337000" />
-      <workItem from="1545823931836" duration="14964000" />
+      <workItem from="1545823931836" duration="15035000" />
+      <workItem from="1545845245898" duration="3506000" />
+      <workItem from="1545848985256" duration="980000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="34292000" />
+    <option name="totallyTimeSpent" value="38849000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -196,7 +205,7 @@
     <frame x="0" y="0" width="1920" height="1080" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.13365282" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.13578275" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -208,7 +217,7 @@
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32970297" />
       <window_info anchor="bottom" id="Database Changes" order="7" />
       <window_info anchor="bottom" id="Version Control" order="8" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="9" visible="true" weight="0.3831683" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="9" visible="true" weight="0.4188119" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -228,14 +237,14 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/input-output/lena_output.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="15" column="11" selection-start-line="15" selection-start-column="11" selection-end-line="15" selection-end-column="11" />
-        </state>
-      </provider>
       <provider editor-type-id="LargeFileEditor">
         <state relative-caret-position="30">
           <caret column="212" selection-start-column="212" selection-end-column="212" />
+        </state>
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="15" column="11" selection-start-line="15" selection-start-column="11" selection-end-line="15" selection-end-column="11" />
         </state>
       </provider>
     </entry>
@@ -249,10 +258,23 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/text_to_image.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" lean-forward="true" selection-start-line="7" selection-end-line="7" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/input-output/yinyang.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/denoiser.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="33" selection-start-line="14" selection-start-column="33" selection-end-line="14" selection-end-column="33" />
+        <state relative-caret-position="195">
+          <caret line="13" column="17" lean-forward="true" selection-start-line="13" selection-start-column="17" selection-end-line="13" selection-end-column="17" />
         </state>
       </provider>
     </entry>

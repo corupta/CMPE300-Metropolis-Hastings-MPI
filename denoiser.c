@@ -2,8 +2,9 @@
 Student Name: Halit Özsoy
 Student Number: 2016400141
 Compile Status: Compiling
-Program Status: TODO - NOT FINISHED
-Notes: ...
+Program Status: Working
+Notes: The processes all work as asynchronous as possible. They do not sync after each iteration, instead each
+ process returns an immediate result at its current iteration when it's asked for a sum of values from a neighbour.
 */
 #include <mpi.h>
 #include <stdio.h>
@@ -12,7 +13,7 @@ Notes: ...
 #include <math.h>
 #include <time.h>
 
-#define TOTAL_ITERATIONS 50000000
+#define TOTAL_ITERATIONS 5000000
 #define MASTER_RANK 0
 #define DIRECTIONS 8
 
@@ -96,11 +97,11 @@ void initializeAnswers(int *neighbours, int *positions, MPI_Request* answerReque
 int summer(char** subImage, int rows, int columns, int rowCenter, int columnCenter) {
   int sum = 0;
   int i, j;
-  for (i = rowCenter - 1; i < rowCenter + 1; ++i) {
+  for (i = rowCenter - 1; i <= rowCenter + 1; ++i) {
       if (i >= 0 && i < rows) { // if within row boundaries
-          for (j = columnCenter - 1; j < columnCenter + 1; ++j) {
+          for (j = columnCenter - 1; j <= columnCenter + 1; ++j) {
               if (j >= 0 && j < columns) { // if within column boundaries
-                  if (i != rowCenter && j != columnCenter) { // skip center
+                  if (i != rowCenter || j != columnCenter) { // skip center
                       sum += (int) subImage[i][j];
                   }
               }
@@ -263,6 +264,8 @@ int slave(int world_size, int world_rank, double beta, double gammaValue) {
         /* pick a random pixel */
         int rowPosition = rand() % rows;
         int columnPosition = rand() % columns;
+
+        // printf("selected pixel %d / %d  --  %d / %d\n", rowPosition, rows, columnPosition, columns);
         /* pick a random pixel done */
         /* sum neighbour cells */
         int sum = summer(subImage, rows, columns, rowPosition, columnPosition);
@@ -298,7 +301,10 @@ int slave(int world_size, int world_rank, double beta, double gammaValue) {
         sum += askResult(askRequests, &askReqResCount, askResponses, askResponseValues);
         /* sum neighbour cells done */
         /* calculate delta_e */
-        double deltaE = - 2 * subImage[rowPosition][columnPosition] * (gammaValue * initialSubImage[rowPosition][columnPosition] + beta * sum);
+        // double deltaE = - 2 * subImage[rowPosition][columnPosition] * (gammaValue * initialSubImage[rowPosition][columnPosition] + beta * sum);
+        double deltaE = -2 * gammaValue * initialSubImage[rowPosition][columnPosition] * subImage[rowPosition][columnPosition]
+                -2 * beta * subImage[rowPosition][columnPosition] * sum;
+        // printf("delta: %f exp delta %f\n", deltaE, exp(deltaE));
         // deltaE = log(accept_probability)  *** accept_probability can be bigger than 1, since we skipped Min(1, acc_prob) ***
         if (log(randomProbability()) <= deltaE) {
             // if accepted, flip the pixel
@@ -377,7 +383,8 @@ int master(int world_size, int world_rank, char* input, char* output, int grid) 
         columnsPerSlave = columnCount;
         slavesPerRow = 1;
         if (rowsPerSlave * slaveCount != rowCount) {
-            fprintf(stderr, "Error (Row Mode): rowCount is not divisible by the slave count, \"world_size - 1\"\n");
+            fprintf(stderr, "Error (Row Mode): rowCount is not divisible by the slave count, "
+                            "\"world_size - 1\" = %d where row count is %d\n", world_size - 1, rowCount);
         }
     }
     int slaveRank;
@@ -387,11 +394,12 @@ int master(int world_size, int world_rank, char* input, char* output, int grid) 
         int top = slaveRank <= slavesPerRow ? -1 : slaveRank - slavesPerRow;
         int right = slaveRank % slavesPerRow == 0 ? -1 : slaveRank + 1;
         int bottom = slaveRank > slaveCount - slavesPerRow ? -1 : slaveRank + slavesPerRow;
-        int left = (slaveRank - 1) % slavesPerRow == 0 ? -1 : slaveRank + 1;
+        int left = (slaveRank - 1) % slavesPerRow == 0 ? -1 : slaveRank - 1;
         int topRight = (top == -1 || right == -1) ? -1 : slaveRank - slavesPerRow + 1;
         int bottomRight = (bottom == -1 || right == -1) ? -1 : slaveRank + slavesPerRow + 1;
         int bottomLeft = (bottom == -1 || left == -1) ? -1 : slaveRank + slavesPerRow - 1;
         int topLeft = (top == -1 || left == -1) ? -1 : slaveRank - slavesPerRow - 1;
+     //   printf("%d ranks => %d %d %d %d %d %d %d %d\n", slaveRank, top, right, bottom, left, topRight, bottomRight, bottomLeft, topLeft);
         sendMessage(&top, 1, MPI_INT, slaveRank, TOP);
         sendMessage(&right, 1, MPI_INT, slaveRank, RIGHT);
         sendMessage(&bottom, 1, MPI_INT, slaveRank, BOTTOM);
@@ -455,11 +463,11 @@ int main(int argc, char** argv) {
         if (argc < 5 || argc > 6) {
             fprintf(stderr, "Please, run the program as \n"
                             "\"denoiser <input> <output> <beta> <pi>\", or as \n"
-                            "\"denoiser <input> <output> <beta> <pi> grid\n"
+                            "\"denoiser <input> <output> <beta> <pi> row\n"
             );
             return 1;
         }
-        int grid = argc == 6 && strcmp(argv[5], "grid") == 0;
+        int grid = argc != 6 || strcmp(argv[5], "row") != 0;
         if (grid && sqrt(world_size - 1) * sqrt(world_size - 1) != world_size - 1) {
             fprintf(stderr, "When running in grid mode, the number of slaves "
                             "(number of processors - 1) must be a square number!\n");
