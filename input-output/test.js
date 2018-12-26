@@ -1,3 +1,7 @@
+//
+// Created by CorupTa on 2018-12-25.
+//
+
 "use strict";
 
 const path = require('path');
@@ -33,6 +37,9 @@ class Queue {
       this.tail = this.tail.next;
     } else {
       this.eof = true;
+      if(!this.top.data) {
+        this.done = true;
+      }
     }
   }
   front() {
@@ -69,7 +76,7 @@ const fileReaderCreator = (filename, key) => fs.stat(filename, (err, stats) => {
   totBytes[key] = stats.size;
   queues[key] = new Queue();
   streams[key] = fs.createReadStream(
-    path.resolve(__dirname, filename)   
+    path.resolve(filename)
   )
   readline.createInterface({
     input: streams[key],
@@ -128,4 +135,4 @@ const calculator = () => {
   }
 }
 
-calculator();
+setTimeout(calculator, calculateClock);
