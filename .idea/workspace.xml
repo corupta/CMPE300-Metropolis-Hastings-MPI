@@ -11,7 +11,10 @@
   <component name="ChangeListManager">
     <list default="true" id="f2ae6051-5a73-4f54-9e80-a81fe77c7afc" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/denoiser" beforeDir="false" afterPath="$PROJECT_DIR$/denoiser" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/denoiser.c" beforeDir="false" afterPath="$PROJECT_DIR$/denoiser.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/denoiser.dSYM/Contents/Resources/DWARF/denoiser" beforeDir="false" afterPath="$PROJECT_DIR$/denoiser.dSYM/Contents/Resources/DWARF/denoiser" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input-output/lena_output.txt" beforeDir="false" afterPath="$PROJECT_DIR$/input-output/lena_output.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -26,8 +29,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/denoiser.c">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="125">
-                  <caret line="174" column="5" lean-forward="true" selection-start-line="174" selection-start-column="5" selection-end-line="174" selection-end-column="5" />
+                <state relative-caret-position="210">
+                  <caret line="14" column="33" selection-start-line="14" selection-start-column="33" selection-end-line="14" selection-end-column="33" />
                 </state>
               </provider>
             </entry>
@@ -40,7 +43,7 @@
             <entry file="file://$PROJECT_DIR$/denoiser.c">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="187">
-                  <caret line="393" column="33" selection-start-line="393" selection-start-column="33" selection-end-line="393" selection-end-column="33" />
+                  <caret line="441" column="33" selection-start-line="441" selection-start-column="33" selection-end-line="441" selection-end-column="33" />
                 </state>
               </provider>
             </entry>
@@ -51,32 +54,50 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>freeQ</find>
-      <find>val =</find>
-      <find>fopen</find>
-      <find>getline</find>
-      <find>while(ro</find>
-      <find>free</find>
-      <find>toto</find>
-      <find>path.resol</find>
-      <find>.front()</find>
-      <find>ERROR =</find>
-      <find>COLUMNNUMBER</find>
-      <find>!==</find>
-      <find>sran</find>
-      <find>askResponsesCount</find>
-      <find>askRequestsCount</find>
+      <find>answerResponses[di</find>
+      <find>Wait</find>
+      <find>askRequestCount</find>
+      <find>&amp;askResponseCount,</find>
+      <find>Count</find>
+      <find>askResponseCount</find>
+      <find>askReqResCount</find>
+      <find>askRequestCou</find>
+      <find>summer</find>
+      <find>gamma</find>
+      <find>char**</find>
+      <find>subI</find>
+      <find>char*[][]</find>
+      <find>summer(sub</find>
+      <find>char*</find>
+      <find>char* sub</find>
+      <find>&amp;subImage</find>
+      <find>(char)m</find>
+      <find>&amp;sub</find>
+      <find>Running</find>
+      <find>read sth.</find>
+      <find>Isend</find>
+      <find>iRec</find>
+      <find>Irecv</find>
+      <find>Ire</find>
+      <find>wait</find>
+      <find>askWai</find>
+      <find>finishedCount</find>
+      <find>MPI_REQU`</find>
       <find>MPI_REQUEST</find>
-      <find>===</find>
-      <find>IRecv</find>
     </findStrings>
     <replaceStrings>
       <replace>askResponseCounts</replace>
       <replace>askResponseCount</replace>
       <replace>askRequestCount</replace>
-      <replace>MPI_Request</replace>
       <replace>!=</replace>
       <replace>Irecv</replace>
+      <replace>&amp;askRequestCount</replace>
+      <replace>&amp;askResponseCount</replace>
+      <replace>askReqResCount</replace>
+      <replace>gammaValue</replace>
+      <replace>subImage</replace>
+      <replace>finishedReqResCount</replace>
+      <replace>MPI_Request</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -155,12 +176,12 @@
       <updated>1545755417458</updated>
       <workItem from="1545755419780" duration="1991000" />
       <workItem from="1545798152225" duration="17337000" />
-      <workItem from="1545823931836" duration="9464000" />
+      <workItem from="1545823931836" duration="14964000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="28792000" />
+    <option name="totallyTimeSpent" value="34292000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -187,7 +208,7 @@
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32970297" />
       <window_info anchor="bottom" id="Database Changes" order="7" />
       <window_info anchor="bottom" id="Version Control" order="8" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="9" visible="true" weight="0.5356436" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="9" visible="true" weight="0.3831683" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -230,8 +251,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/denoiser.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="125">
-          <caret line="174" column="5" lean-forward="true" selection-start-line="174" selection-start-column="5" selection-end-line="174" selection-end-column="5" />
+        <state relative-caret-position="210">
+          <caret line="14" column="33" selection-start-line="14" selection-start-column="33" selection-end-line="14" selection-end-column="33" />
         </state>
       </provider>
     </entry>

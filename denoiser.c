@@ -10,8 +10,9 @@ Notes: ...
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 
-#define TOTAL_ITERATIONS 5000000
+#define TOTAL_ITERATIONS 50000000
 #define MASTER_RANK 0
 #define DIRECTIONS 8
 
@@ -66,7 +67,7 @@ double randomProbability() {
 enum MessageType { TOP = 0, RIGHT = 1, BOTTOM = 2, LEFT = 3,
         TOP_RIGHT = 4, BOTTOM_RIGHT = 5, BOTTOM_LEFT = 6, TOP_LEFT = 7,
         ROWS = 20, COLUMNS = 21,
-        QUESTION = 500, ANSWER = 600, IMAGE_START = 1000, FINAL_IMAGE_START = 60000 };
+        QUESTION = 500, ANSWER = 600, FINISHED = 700, IMAGE_START = 1000, FINAL_IMAGE_START = 60000 };
 
 void sendMessage(void* data, int count, MPI_Datatype datatype, int destination, int tag) {
     MPI_Send(data, count, datatype, destination, tag, MPI_COMM_WORLD);
@@ -77,7 +78,7 @@ void receiveMessage(void* data, int count, MPI_Datatype datatype, int source, in
 }
 
 void initializeAnAnswer(int neighbour, int *position, MPI_Request *answerRequest) {
-    MPI_Irecv((void*)position, 1, MPI_INT, neighbour, QUESTION, MPI_COMM_WORLD, MPI_STATUS_IGNORE, answerRequest);
+    MPI_Irecv((void*)position, 1, MPI_INT, neighbour, QUESTION, MPI_COMM_WORLD, answerRequest);
 }
 
 void initializeAnswers(int *neighbours, int *positions, MPI_Request* answerRequests, MPI_Request* answerResponses) {
@@ -123,7 +124,7 @@ void answerAll(char** subImage, int rows, int columns, int *neighbours, int *pos
             position = positions[direction];
             initializeAnAnswer(neighbours[direction], positions+direction, answerRequests+direction);
             if (answerResponses[direction]) {
-                MPI_WAIT(answerResponses[direction], MPI_STATUS_IGNORE);
+                MPI_Wait(answerResponses+direction, MPI_STATUS_IGNORE);
                 answerResponses[direction] = NULL;
             }
             switch (direction) {
@@ -159,69 +160,106 @@ void answerAll(char** subImage, int rows, int columns, int *neighbours, int *pos
                     break;
             }
             int sum = summer(subImage, rows, columns, rowCenter, columnCenter);
-            MPI_Isend((void)&sum, 1, MPI_INT, neighbours[direction], ANSWER,
+            MPI_Isend((void*)&sum, 1, MPI_INT, neighbours[direction], ANSWER,
                     MPI_COMM_WORLD, answerResponses+direction);
         }
     }
 
 }
 
-void askAsync(int neighbour, int position, MPI_Request* askRequests, int &askRequestCount,
-        MPI_Request* askResponses, int &askResponseCount, int* askResponseValues
+void sendFinishedAll(int* neighbours, MPI_Request* finishedRequests, MPI_Request* finishedResponses, int *finishedReqResCount) {
+    int direction;
+    for (direction = 0; direction < DIRECTIONS; ++direction) {
+        if (neighbours[direction] != -1) {
+            MPI_Isend(NULL, 0, MPI_INT, neighbours[direction], FINISHED, MPI_COMM_WORLD, finishedRequests+(*finishedReqResCount));
+            MPI_Irecv(NULL, 0, MPI_INT, neighbours[direction], FINISHED, MPI_COMM_WORLD, finishedResponses+(*finishedReqResCount));
+            ++(*finishedReqResCount);
+        }
+    }
+};
+
+int testFinishedAll(int* neighbours, MPI_Request* finishedRequests, MPI_Request* finishedResponses, int *finishedReqResCount) {
+    int requestResult = 1, responseResult = 1;
+    if (*finishedReqResCount > 0) {
+        MPI_Testall(*finishedReqResCount, finishedRequests, &requestResult, MPI_STATUSES_IGNORE);
+        MPI_Testall(*finishedReqResCount, finishedResponses, &responseResult, MPI_STATUSES_IGNORE);
+    }
+    return requestResult && responseResult;
+};
+
+void askAsync(int neighbour, int position, MPI_Request* askRequests, int *askReqResCount,
+        MPI_Request* askResponses, int* askResponseValues
     ) {
     if (neighbour == -1) {
         // no neighbour in this direction
         return;
     }
-    MPI_Isend((void*)&position, 1, MPI_INT, neighbour, QUESTION, MPI_COMM_WORLD, askRequests+askRequestCount);
-    ++askRequestCount;
-    MPI_Irecv((void*)(askResponseValues+askResponseCount), 1, MPI_INT, neighbour, ANSWER,
-            MPI_COMM_WORLD, MPI_STATUS_IGNORE, askResponses+askResponseCount);
-    ++askResponseCount;
+    MPI_Isend((void*)&position, 1, MPI_INT, neighbour, QUESTION, MPI_COMM_WORLD, askRequests+(*askReqResCount));
+    MPI_Irecv((void*)(askResponseValues+(*askReqResCount)), 1, MPI_INT, neighbour, ANSWER,
+            MPI_COMM_WORLD, askResponses+(*askReqResCount));
+    ++(*askReqResCount);
 }
 
-int askWaitResult(MPI_Request* askResponses, int &askResponseCount, int* askResponseValues) {
+int testAskAll(MPI_Request* askRequests, int *askReqResCount, MPI_Request* askResponses) {
+    int requestResult = 1, responseResult = 1;
+    if (*askReqResCount > 0) {
+        MPI_Testall(*askReqResCount, askRequests, &requestResult, MPI_STATUSES_IGNORE);
+        MPI_Testall(*askReqResCount, askResponses, &responseResult, MPI_STATUSES_IGNORE);
+    }
+    return requestResult && responseResult;
+}
+
+int askResult(MPI_Request* askRequests, int *askReqResCount, MPI_Request* askResponses, int* askResponseValues) {
+    // called after a success testAskAll all ask requests and responses so it's certain that they all did finish.
     int result = 0;
-    if(askResponseCount > 0) {
-        MPI_Waitall(askResponseCount, askResponses, MPI_STATUSES_IGNORE);
-        while (askResponseCount --) {
-            result += askResponseValues[askResponseCount];
+    if((*askReqResCount) > 0) {;
+        while (*askReqResCount) {
+            --(*askReqResCount);
+            result += askResponseValues[(*askReqResCount)];
         }
     }
     return result;
 }
 
-int slave(int world_size, int world_rank, double beta, double pi) {
-    int iterations = TOTAL_ITERATIONS / world_size;
+int slave(int world_size, int world_rank, double beta, double gammaValue) {
+    int iterations = TOTAL_ITERATIONS / (world_size - 1);
 
     int rows, columns;
     receiveMessage(&rows, 1, MPI_INT, MASTER_RANK, ROWS);
     receiveMessage(&columns, 1, MPI_INT, MASTER_RANK, COLUMNS);
 
     int neighbours[DIRECTIONS], direction;
-    for (direction = 0; direction < DIRECTIONS; ++i) {
+    for (direction = 0; direction < DIRECTIONS; ++direction) {
         receiveMessage(neighbours+direction, 1, MPI_INT, MASTER_RANK, direction);
     }
 
-    char subImage[rows][columns], initialSubImage[row][columns], i;
+    char* subImage[rows], initialSubImage[rows][columns];
+    int i;
     for (i = 0; i < rows; ++i) {
-        receiveMessage(subImage[i], columns, MPI_BYTE, MASTER_RANK, IMAGE_START + i);
-        memcpy(initialSubImage[i], subImage[i], columns);
+        receiveMessage(initialSubImage[i], columns, MPI_BYTE, MASTER_RANK, IMAGE_START + i);
+        subImage[i] = (char*)malloc(columns * sizeof(char));
+        memcpy(subImage[i], initialSubImage[i], columns);
     }
+    printf("hi from slave %d who finished reading\n", world_rank);
 
     MPI_Request askRequests[DIRECTIONS];
     MPI_Request askResponses[DIRECTIONS];
     MPI_Request answerRequests[DIRECTIONS];
     MPI_Request answerResponses[DIRECTIONS];
+    MPI_Request finishedRequests[DIRECTIONS];
+    MPI_Request finishedResponses[DIRECTIONS];
     int positions[DIRECTIONS];
     int askResponseValues[DIRECTIONS];
 
-    int askRequestCount = 0, askResponseCount = 0;
+    int askReqResCount = 0, finishedReqResCount = 0;
 
     /* initialize all answer requests (Irecv for all neighbours for potentials questions in later) */
     initializeAnswers(neighbours, positions, answerRequests, answerResponses);
     /* initialize all answer requests done */
     while(iterations --) {
+        if (iterations % 1000000 == 0) {
+            printf("slave %d started a new millionth iteration - left: %d\n", world_rank, iterations);
+        }
         /* pick a random pixel */
         int rowPosition = rand() % rows;
         int columnPosition = rand() % columns;
@@ -229,46 +267,56 @@ int slave(int world_size, int world_rank, double beta, double pi) {
         /* sum neighbour cells */
         int sum = summer(subImage, rows, columns, rowPosition, columnPosition);
         if (rowPosition == 0) {
-            askAsync(neighbours[TOP], columnPosition, askRequests, askRequestCount, askResponses, askResponseCount, askResponseValues);
+            askAsync(neighbours[TOP], columnPosition, askRequests, &askReqResCount, askResponses, askResponseValues);
             if (columnPosition == 0) {
-                askAsync(neighbours[TOP_LEFT], 0, askRequests, askRequestCount, askResponses, askResponseCount, askResponseValues);
+                askAsync(neighbours[TOP_LEFT], 0, askRequests, &askReqResCount, askResponses, askResponseValues);
             }
             if (columnPosition == columns - 1) {
-                askAsync(neighbours[TOP_RIGHT], 0, askRequests, askRequestCount, askResponses, askResponseCount, askResponseValues);
+                askAsync(neighbours[TOP_RIGHT], 0, askRequests, &askReqResCount, askResponses, askResponseValues);
             }
         }
         if (rowPosition == rows - 1) {
-            askAsync(neighbours[BOTTOM], columnPosition, askRequests, askRequestCount, askResponses, askResponseCount, askResponseValues);
+            askAsync(neighbours[BOTTOM], columnPosition, askRequests, &askReqResCount, askResponses, askResponseValues);
             if (columnPosition == 0) {
-                askAsync(neighbours[BOTTOM_LEFT], 0, askRequests, askRequestCount, askResponses, askResponseCount, askResponseValues);
+                askAsync(neighbours[BOTTOM_LEFT], 0, askRequests, &askReqResCount, askResponses, askResponseValues);
             }
             if (columnPosition == columns - 1) {
-                askAsync(neighbours[BOTTOM_RIGHT], 0, askRequests, askRequestCount, askResponses, askResponseCount, askResponseValues);
+                askAsync(neighbours[BOTTOM_RIGHT], 0, askRequests, &askReqResCount, askResponses, askResponseValues);
             }
         }
         if (columnPosition == 0) {
-            askAsync(neighbours[LEFT], rowPosition, askRequests, askRequestCount, askResponses, askResponseCount, askResponseValues);
+            askAsync(neighbours[LEFT], rowPosition, askRequests, &askReqResCount, askResponses, askResponseValues);
         }
         if (columnPosition == columns - 1) {
-            askAsync(neighbours[RIGHT], rowPosition, askRequests, askRequestCount, askResponses, askResponseCount, askResponseValues)
+            askAsync(neighbours[RIGHT], rowPosition, askRequests, &askReqResCount, askResponses, askResponseValues);
         }
-        /* answer neighbours' questions before waiting for answers for its questions -- prevents deadlock */
-        answerAll(subImage, rows, columns, neighbours, positions, answerRequests, answerResponses);
-        /* answer neighbours' questions done */
-        sum += askWaitResult(askResponses, askResponseCount, askResponseValues);
+        while (!testAskAll(askRequests, &askReqResCount, askResponses)) {
+            /* answer neighbours' questions before waiting for answers for its questions -- prevents deadlock */
+            answerAll(subImage, rows, columns, neighbours, positions, answerRequests, answerResponses);
+            /* answer neighbours' questions done */
+        }
+        sum += askResult(askRequests, &askReqResCount, askResponses, askResponseValues);
         /* sum neighbour cells done */
         /* calculate delta_e */
-        double deltaE = - 2 * subImage[i][j] * (gamma * initialSubImage[i][j] + beta * sum);
-        // delteE = log(accept_probability)  *** accept_probability can be bigger than 1, since we skipped Min(1, acc_prob) ***
+        double deltaE = - 2 * subImage[rowPosition][columnPosition] * (gammaValue * initialSubImage[rowPosition][columnPosition] + beta * sum);
+        // deltaE = log(accept_probability)  *** accept_probability can be bigger than 1, since we skipped Min(1, acc_prob) ***
         if (log(randomProbability()) <= deltaE) {
             // if accepted, flip the pixel
-            subImage[i][j] = -subImage[i][j];
+            subImage[rowPosition][columnPosition] = -subImage[rowPosition][columnPosition];
         }
     }
-
+    // dont finish yet, instead wait until all neighbours also finish
+    sendFinishedAll(neighbours, finishedRequests, finishedResponses, &finishedReqResCount);
+    while (!testFinishedAll(neighbours, finishedRequests, finishedResponses, &finishedReqResCount)) {
+        // some neighbours are not finished yet, keep answering
+        answerAll(subImage, rows, columns, neighbours, positions, answerRequests, answerResponses);
+    }
+    
     for (i = 0; i < rows; ++i) {
         sendMessage(subImage[i], columns, MPI_BYTE, MASTER_RANK, FINAL_IMAGE_START + i);
+        free(subImage[i]);
     }
+    printf("slave %d finished its work end exited successfully.\n", world_rank);
     return 0;
 }
 
@@ -339,7 +387,7 @@ int master(int world_size, int world_rank, char* input, char* output, int grid) 
         int top = slaveRank <= slavesPerRow ? -1 : slaveRank - slavesPerRow;
         int right = slaveRank % slavesPerRow == 0 ? -1 : slaveRank + 1;
         int bottom = slaveRank > slaveCount - slavesPerRow ? -1 : slaveRank + slavesPerRow;
-        int left = slaveRank % slavesPerRow == 1 ? -1 : slaveRank + 1;
+        int left = (slaveRank - 1) % slavesPerRow == 0 ? -1 : slaveRank + 1;
         int topRight = (top == -1 || right == -1) ? -1 : slaveRank - slavesPerRow + 1;
         int bottomRight = (bottom == -1 || right == -1) ? -1 : slaveRank + slavesPerRow + 1;
         int bottomLeft = (bottom == -1 || left == -1) ? -1 : slaveRank + slavesPerRow - 1;
@@ -417,7 +465,7 @@ int main(int argc, char** argv) {
                             "(number of processors - 1) must be a square number!\n");
             return 1;
         }
-        fprintf(stdout, "Running in %s mode.", grid ? "grid" : "row");
+        fprintf(stdout, "Running in %s mode.\n", grid ? "grid" : "row");
         if ((error = master(world_size, world_rank, argv[1], argv[2], grid))) {
             fprintf(stderr, "Error in master");
             return error;
@@ -425,8 +473,10 @@ int main(int argc, char** argv) {
     } else { // CALCULATE GAMMA AND RUN SLAVE
         double beta = atof(argv[3]);
         double pi = atof(argv[4]);
-        double gamma = log((1 - pi) / pi) / 2;
-        if ((error = slave(world_size, world_rank, beta, gamma))) {
+        double gammaValue = log((1 - pi) / pi) / 2;
+        // named gammaValue instead of gamma bc of the below warning:
+        // warning: 'gamma' is deprecated: first deprecated in macOS 10.9 [-Wdeprecated-declarations]
+        if ((error = slave(world_size, world_rank, beta, gammaValue))) {
             fprintf(stderr, "Error in slave");
             return error;
         };
