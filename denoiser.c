@@ -1,11 +1,15 @@
-//
-// Created by CorupTa on 2018-12-26.
-//
-
+/*
+Student Name: Halit Özsoy
+Student Number: 2016400141
+Compile Status: Compiling
+Program Status: TODO - NOT FINISHED
+Notes: ...
+*/
 #include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #define TOTAL_ITERATIONS 5000000
 #define MASTER_RANK 0
@@ -64,7 +68,7 @@ void receiveMessage(void* data, int count, MPI_Datatype datatype, int source, in
     MPI_Recv(data, count, datatype, source, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 }
 
-void slave(int world_size, int world_rank, double beta, double pi) {
+int slave(int world_size, int world_rank, double beta, double pi) {
     int iterations = TOTAL_ITERATIONS / world_size;
 
     int rows, columns;
@@ -95,9 +99,10 @@ void slave(int world_size, int world_rank, double beta, double pi) {
     for (i = 0; i < rows; ++i) {
         sendMessage(subImage[i], columns, MPI_BYTE, MASTER_RANK, FINAL_IMAGE_START + i);
     }
+    return 0;
 }
 
-void master(int world_size, int world_rank, char* input, char* output, double beta, double pi, int grid) {
+int master(int world_size, int world_rank, char* input, char* output, double beta, double pi, int grid) {
     FILE *inputFile, *outputFile;
     inputFile = fopen(input, "r");
 
@@ -137,54 +142,67 @@ void master(int world_size, int world_rank, char* input, char* output, double be
     }
 
     int slaveCount = world_size - 1;
+    int rowsPerSlave, columnsPerSlave, slavesPerRow;
     if (grid) {
-
+        int sqrtSlaveCount = sqrt(slaveCount);
+        rowsPerSlave = rowCount / sqrtSlaveCount;
+        columnsPerSlave = columnCount / sqrtSlaveCount;
+        slavesPerRow = sqrtSlaveCount;
+        if (rowsPerSlave * sqrtSlaveCount != rowCount
+            || columnsPerSlave * sqrtSlaveCount != columnCount) {
+            fprintf(stderr, "Error (Grid Mode): rowCount or columnCount is not divisible "
+                            "by the square root of slave count, \"sqrt(world_size - 1)\"\n");
+            return 1;
+        }
     } else {
-        int rowsPerSlave = rowCount / slaveCount;
-        int slaveRank;
-        for(slaveRank = 1; slaveRank <= slaveCount; ++slaveRank) {
-            sendMessage(&rowsPerSlave, 1, MPI_INT, slaveRank, ROWS);
-            sendMessage(&columnCount, 1, MPI_INT, slaveRank, COLUMNS);
-            int top = slaveRank == 1 ? - 1 : slaveRank - 1;
-            int right = -1;
-            int bottom = slaveRank == slaveCount ? -1 : slaveRank + 1;
-            int left = -1;
-            sendMessage(&top, 1, MPI_INT, slaveRank, TOP);
-            sendMessage(&right, 1, MPI_INT, slaveRank, RIGHT);
-            sendMessage(&bottom, 1, MPI_INT, slaveRank, BOTTOM);
-            sendMessage(&left, 1, MPI_INT, slaveRank, LEFT);
+        rowsPerSlave = rowCount / slaveCount;
+        columnsPerSlave = columnCount;
+        slavesPerRow = 1;
+        if (rowsPerSlave * slaveCount != rowCount) {
+            fprintf(stderr, "Error (Row Mode): rowCount is not divisible by the slave count, \"world_size - 1\"\n");
         }
-        char* row;
-        int rowNumber = 0, slaveRowNumber;
-        while((row = (char*)pop(rowQueue))) {
-            slaveRank = (rowNumber / rowsPerSlave) + 1;
-            slaveRowNumber = rowNumber % rowsPerSlave;
-            sendMessage(row, columnCount, MPI_BYTE, slaveRank, IMAGE_START + slaveRowNumber);
-            free(row);
-            ++rowNumber;
-        }
-        freeQueue(rowQueue);
     }
+    int slaveRank;
+    for (slaveRank = 1; slaveRank <= slaveCount; ++slaveRank) {
+        sendMessage(&rowsPerSlave, 1, MPI_INT, slaveRank, ROWS);
+        sendMessage(&columnsPerSlave, 1, MPI_INT, slaveRank, COLUMNS);
+        int top = slaveRank <= slavesPerRow ? -1 : slaveRank - slavesPerRow;
+        int right = slaveRank % slavesPerRow == 0 ? -1 : slaveRank + 1;
+        int bottom = slaveRank > slaveCount - slavesPerRow ? -1 : slaveRank + slavesPerRow;
+        int left = slaveRank % slavesPerRow == 1 ? -1 : slaveRank + 1;
+        sendMessage(&top, 1, MPI_INT, slaveRank, TOP);
+        sendMessage(&right, 1, MPI_INT, slaveRank, RIGHT);
+        sendMessage(&bottom, 1, MPI_INT, slaveRank, BOTTOM);
+        sendMessage(&left, 1, MPI_INT, slaveRank, LEFT);
+    }
+    char* row;
+    int rowNumber = 0, slaveRowNumber, columnNumber;
+    while((row = (char*)pop(rowQueue))) {
+        int slaveRankStart = (rowNumber / rowsPerSlave) * slavesPerRow + 1;
+        int slaveRowNumber = rowNumber % rowsPerSlave;
+        for (columnNumber = 0; columnNumber < columnCount; columnNumber += columnsPerSlave) {
+            slaveRank = slaveRankStart + columnNumber / columnsPerSlave;
+            sendMessage(row + columnNumber, columnsPerSlave, MPI_BYTE, slaveRank, IMAGE_START + slaveRowNumber);
+        }
+        free(row);
+        ++rowNumber;
+    }
+    freeQueue(rowQueue);
     printf("let the slaves work now\n");
 
 
     char finalResult[rowCount][columnCount];
-    if (grid) {
-
-    } else {
-        int rowsPerSlave = rowCount / slaveCount;
-        int rowNumber, slaveRowNumber, slaveRank;
-        for(rowNumber = 0; rowNumber < rowCount; ++rowNumber) {
-            slaveRank = (rowNumber / rowsPerSlave) + 1;
+    for (rowNumber = 0; rowNumber < rowCount; ++rowNumber) {
+        for (columnNumber = 0; columnNumber < columnCount; columnNumber += columnsPerSlave) {
+            slaveRank = (rowNumber / rowsPerSlave) * slavesPerRow + columnNumber / columnsPerSlave + 1;
             slaveRowNumber = rowNumber % rowsPerSlave;
-            receiveMessage(finalResult[rowNumber], columnCount, MPI_BYTE, slaveRank,
-                    FINAL_IMAGE_START + slaveRowNumber);
+            receiveMessage(finalResult[rowNumber] + columnNumber, columnsPerSlave,
+                    MPI_BYTE, slaveRank, FINAL_IMAGE_START + slaveRowNumber);
         }
     }
 
     printf("finished calculations and communciations, started writing to output\n");
     outputFile = fopen(output, "w");
-    int rowNumber, columnNumber;
     for (rowNumber = 0; rowNumber < rowCount; ++rowNumber) {
         for (columnNumber = 0; columnNumber < columnCount; ++columnNumber) {
             fprintf(outputFile, "%d ", (int)finalResult[rowNumber][columnNumber]);
@@ -192,6 +210,7 @@ void master(int world_size, int world_rank, char* input, char* output, double be
         fprintf(outputFile, "\n");
     }
     printf("finished successfully!\n");
+    return 0;
 }
 
 int main(int argc, char** argv) {
@@ -202,13 +221,18 @@ int main(int argc, char** argv) {
         );
         return 1;
     }
-
-
+    int grid = argc == 6 && !strcmp(argv[5], "grid");
 
     MPI_Init(NULL, NULL);
 
     int world_size;
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+
+    if (grid && sqrt(world_size - 1) * sqrt(world_size - 1) != world_size - 1) {
+        fprintf(stderr, "When running in grid mode, the number of slaves "
+                        "(number of processors - 1) must be a square number!\n");
+        return 1;
+    }
 
     int world_rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
@@ -218,11 +242,18 @@ int main(int argc, char** argv) {
     int name_len;
     MPI_Get_processor_name(processor_name, &name_len);
     */
+    int error = 0;
     if (world_rank == MASTER_RANK) {
-        master(world_size, world_rank, argv[1], argv[2], atof(argv[3]), atof(argv[4])
-                , argc == 6 && !strcmp(argv[5], "grid"));
+        if ((error = master(world_size, world_rank, argv[1], argv[2],
+                atof(argv[3]), atof(argv[4]), grid))) {
+            fprintf(stderr, "Error in master");
+            return error;
+        };
     } else {
-        slave(world_size, world_rank, atof(argv[3]), atof(argv[4]));
+        if ((error = slave(world_size, world_rank, atof(argv[3]), atof(argv[4])))) {
+            fprintf(stderr, "Error in slave");
+            return error;
+        };
     }
 
 

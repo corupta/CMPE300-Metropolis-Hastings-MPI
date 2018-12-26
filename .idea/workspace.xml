@@ -10,8 +10,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f2ae6051-5a73-4f54-9e80-a81fe77c7afc" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/denoiser.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/input-output/test.js" beforeDir="false" afterPath="$PROJECT_DIR$/input-output/test.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/denoiser" beforeDir="false" afterPath="$PROJECT_DIR$/denoiser" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/denoiser.c" beforeDir="false" afterPath="$PROJECT_DIR$/denoiser.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/denoiser.dSYM/Contents/Resources/DWARF/denoiser" beforeDir="false" afterPath="$PROJECT_DIR$/denoiser.dSYM/Contents/Resources/DWARF/denoiser" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -26,8 +28,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/denoiser.c">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="256">
-                  <caret line="82" column="5" lean-forward="true" selection-start-line="82" selection-start-column="5" selection-end-line="82" selection-end-column="5" />
+                <state relative-caret-position="75">
+                  <caret line="5" column="10" selection-start-line="5" selection-start-column="10" selection-end-line="5" selection-end-column="10" />
                 </state>
               </provider>
             </entry>
@@ -39,8 +41,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/denoiser.c">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="142">
-                  <caret line="194" column="1" selection-start-line="194" selection-start-column="1" selection-end-line="194" selection-end-column="1" />
+                <state relative-caret-position="171">
+                  <caret line="215" column="33" selection-start-line="215" selection-start-column="33" selection-end-line="215" selection-end-column="33" />
                 </state>
               </provider>
             </entry>
@@ -60,6 +62,9 @@
       <find>toto</find>
       <find>path.resol</find>
       <find>.front()</find>
+      <find>ERROR =</find>
+      <find>COLUMNNUMBER</find>
+      <find>!==</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -69,8 +74,8 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/hello.c" />
-        <option value="$PROJECT_DIR$/denoiser.c" />
         <option value="$PROJECT_DIR$/input-output/test.js" />
+        <option value="$PROJECT_DIR$/denoiser.c" />
       </list>
     </option>
   </component>
@@ -137,12 +142,12 @@
       <option name="presentableId" value="Default" />
       <updated>1545755417458</updated>
       <workItem from="1545755419780" duration="1991000" />
-      <workItem from="1545798152225" duration="13374000" />
+      <workItem from="1545798152225" duration="16446000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="15365000" />
+    <option name="totallyTimeSpent" value="18437000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -157,7 +162,7 @@
     <frame x="0" y="0" width="1920" height="1080" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18849841" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.122470714" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -169,7 +174,7 @@
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32970297" />
       <window_info anchor="bottom" id="Database Changes" order="7" />
       <window_info anchor="bottom" id="Version Control" order="8" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="9" visible="true" weight="0.36237624" />
+      <window_info anchor="bottom" id="Terminal" order="9" visible="true" weight="0.3059406" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -212,8 +217,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/denoiser.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="256">
-          <caret line="82" column="5" lean-forward="true" selection-start-line="82" selection-start-column="5" selection-end-line="82" selection-end-column="5" />
+        <state relative-caret-position="75">
+          <caret line="5" column="10" selection-start-line="5" selection-start-column="10" selection-end-line="5" selection-end-column="10" />
         </state>
       </provider>
     </entry>
