@@ -1,5 +1,9 @@
 //
 // Created by CorupTa on 2018-12-25.
+// Original image scores 1 and noisy image scores 0, if an image worse than noisy is supplied the score is negative.
+//
+// Score = (MATCHED PIXELS OF CUSTOM OUTPUT - MATCHED PIXELS OF NOISY IMAGE) / UNMATCHED PIXELS OF NOISY IMAGE
+// (matched means matched with the original image, whereas unmatched means not matched with the original image)
 //
 
 "use strict";
@@ -12,7 +16,7 @@ if (process.argv.length !== 5) {
   throw new Error(
     `
       Please run the program as,
-      "node test.js <original_file> <noisy_file> <output_file>"
+      "node pixel_comparator.js <original_file> <noisy_file> <output_file>"
     `
   );
 }

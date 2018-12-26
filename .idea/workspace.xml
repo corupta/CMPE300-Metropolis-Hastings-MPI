@@ -11,11 +11,13 @@
   <component name="ChangeListManager">
     <list default="true" id="f2ae6051-5a73-4f54-9e80-a81fe77c7afc" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/denoiser" beforeDir="false" afterPath="$PROJECT_DIR$/denoiser" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/denoiser.c" beforeDir="false" afterPath="$PROJECT_DIR$/denoiser.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/denoiser.dSYM/Contents/Resources/DWARF/denoiser" beforeDir="false" afterPath="$PROJECT_DIR$/denoiser.dSYM/Contents/Resources/DWARF/denoiser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/input-output.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/input-output/lena_output.png" beforeDir="false" afterPath="$PROJECT_DIR$/input-output/lena_output.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/input-output/lena_output.txt" beforeDir="false" afterPath="$PROJECT_DIR$/input-output/lena_output.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input-output/test.js" beforeDir="false" afterPath="$PROJECT_DIR$/pixel_comparator.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.sh" beforeDir="false" afterPath="$PROJECT_DIR$/test.sh" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -30,8 +32,26 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/denoiser.c">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="195">
-                  <caret line="13" column="17" lean-forward="true" selection-start-line="13" selection-start-column="17" selection-end-line="13" selection-end-column="17" />
+                <state relative-caret-position="-343">
+                  <caret line="579" column="1" selection-start-line="579" selection-start-column="1" selection-end-line="579" selection-end-column="1" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/README.md">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="45">
+                  <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/test.sh">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="375">
+                  <caret line="25" column="67" lean-forward="true" selection-start-line="25" selection-start-column="67" selection-end-line="25" selection-end-column="67" />
                 </state>
               </provider>
             </entry>
@@ -43,8 +63,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/denoiser.c">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="72">
-                  <caret line="449" column="33" selection-start-line="449" selection-start-column="33" selection-end-line="449" selection-end-column="33" />
+                <state relative-caret-position="155">
+                  <caret line="584" column="33" selection-start-line="584" selection-start-column="33" selection-end-line="584" selection-end-column="33" />
                 </state>
               </provider>
             </entry>
@@ -78,13 +98,13 @@
       <find>made a</find>
       <find>delta</find>
       <find>selecte</find>
-      <find>printf</find>
       <find>slave coun</find>
       <find>world_size -1</find>
       <find>running</find>
       <find>runn</find>
       <find>row</find>
       <find>rowCount</find>
+      <find>printf</find>
     </findStrings>
     <replaceStrings>
       <replace>askResponseCounts</replace>
@@ -109,6 +129,9 @@
       <list>
         <option value="$PROJECT_DIR$/hello.c" />
         <option value="$PROJECT_DIR$/input-output/test.js" />
+        <option value="$PROJECT_DIR$/test.sh" />
+        <option value="$PROJECT_DIR$/pixel_comparator.js" />
+        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/denoiser.c" />
       </list>
     </option>
@@ -133,11 +156,6 @@
             <path>
               <item name="programming-project" type="b2602c69:ProjectViewProjectNode" />
               <item name="programming-project" type="462c0819:PsiDirectoryNode" />
-              <item name="input-output" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="programming-project" type="b2602c69:ProjectViewProjectNode" />
-              <item name="programming-project" type="462c0819:PsiDirectoryNode" />
               <item name="scripts" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
@@ -150,6 +168,11 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -185,12 +208,12 @@
       <workItem from="1545798152225" duration="17337000" />
       <workItem from="1545823931836" duration="15035000" />
       <workItem from="1545845245898" duration="3506000" />
-      <workItem from="1545848985256" duration="980000" />
+      <workItem from="1545848985256" duration="3434000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="38849000" />
+    <option name="totallyTimeSpent" value="41303000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -205,11 +228,11 @@
     <frame x="0" y="0" width="1920" height="1080" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.13578275" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.13578275" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32970297" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
@@ -217,7 +240,7 @@
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32970297" />
       <window_info anchor="bottom" id="Database Changes" order="7" />
       <window_info anchor="bottom" id="Version Control" order="8" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="9" visible="true" weight="0.4188119" />
+      <window_info anchor="bottom" id="Terminal" order="9" visible="true" weight="0.4188119" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -248,16 +271,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/input-output/test.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="264">
-          <caret line="35" column="8" selection-start-line="35" selection-start-column="8" selection-end-line="35" selection-end-column="8" />
-          <folding>
-            <element signature="e#0#2#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/scripts/text_to_image.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
@@ -271,10 +284,34 @@
     <entry file="file://$PROJECT_DIR$/input-output/yinyang.png">
       <provider selected="true" editor-type-id="images" />
     </entry>
+    <entry file="file://$PROJECT_DIR$/pixel_comparator.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret lean-forward="true" />
+          <folding>
+            <element signature="e#0#2#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="375">
+          <caret line="25" column="67" lean-forward="true" selection-start-line="25" selection-start-column="67" selection-end-line="25" selection-end-column="67" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/denoiser.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" column="17" lean-forward="true" selection-start-line="13" selection-start-column="17" selection-end-line="13" selection-end-column="17" />
+        <state relative-caret-position="-343">
+          <caret line="579" column="1" selection-start-line="579" selection-start-column="1" selection-end-line="579" selection-end-column="1" />
         </state>
       </provider>
     </entry>

@@ -23,5 +23,5 @@ image_path="$3/$4_output.png"
 
 mpicc -g $2.c -o $2 &&
 mpiexec -n $1 $2 $noisy_path $output_path $5 $6 $7 &&
-node input-output/test.js $original_path $noisy_path $output_path &&
+node pixel_comparator.js $original_path $noisy_path $output_path &&
 python scripts/text_to_image.py $output_path $image_path

@@ -17,6 +17,8 @@ Notes: The processes all work as asynchronous as possible. They do not sync afte
 #define MASTER_RANK 0
 #define DIRECTIONS 8
 
+/* node and queue is just used to fetch an input text without knowing its dimensions */
+/* below is a simple implementation of a standard queue by me */
 typedef struct node {
     void *val;
     struct node* next;
@@ -59,29 +61,67 @@ void freeQueue(queue *q) {
     free(q->head);
     free(q);
 }
+/* queue implementation finishes */
 
+/**
+ * generates a random number between 0 and 1.0 (both inclusive)
+ * @return (double)0-1.0
+ */
 double randomProbability() {
-    // generate a number between 0 and 1.0 (both inclusive)
     return ((double)rand()) / RAND_MAX;
 }
 
+/**
+ * Define all MESSAGE_TAGs used in MPI commands instead of using plain integers to increase Readability & Writability
+ */
 enum MessageType { TOP = 0, RIGHT = 1, BOTTOM = 2, LEFT = 3,
         TOP_RIGHT = 4, BOTTOM_RIGHT = 5, BOTTOM_LEFT = 6, TOP_LEFT = 7,
         ROWS = 20, COLUMNS = 21,
         QUESTION = 500, ANSWER = 600, FINISHED = 700, IMAGE_START = 1000, FINAL_IMAGE_START = 60000 };
 
+/**
+ * Simple wrapper for MPI_Send to prevent code repetition
+ * @param data
+ * @param count
+ * @param datatype
+ * @param destination
+ * @param tag
+ */
 void sendMessage(void* data, int count, MPI_Datatype datatype, int destination, int tag) {
     MPI_Send(data, count, datatype, destination, tag, MPI_COMM_WORLD);
 }
 
+/**
+ * Simple wrapper for MPI_Recv to prevent code repetition.
+ * @param data
+ * @param count
+ * @param datatype
+ * @param source
+ * @param tag
+ */
 void receiveMessage(void* data, int count, MPI_Datatype datatype, int source, int tag) {
     MPI_Recv(data, count, datatype, source, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 }
 
+/**
+ * initializes an answer request for the future for the given neighbour and current process.
+ * @param neighbour
+ * @param position
+ * @param answerRequest
+ */
 void initializeAnAnswer(int neighbour, int *position, MPI_Request *answerRequest) {
     MPI_Irecv((void*)position, 1, MPI_INT, neighbour, QUESTION, MPI_COMM_WORLD, answerRequest);
 }
 
+/**
+ * initializes an answer request for the future for all neighbours and current process.
+ * an answer request is finished -- received when a neighbour asks the current process a question.
+ * that means the current process should reply with an answer response to that neighbour.
+ * @param neighbours
+ * @param positions
+ * @param answerRequests
+ * @param answerResponses
+ */
 void initializeAnswers(int *neighbours, int *positions, MPI_Request* answerRequests, MPI_Request* answerResponses) {
     int direction;
     for (direction = 0; direction < DIRECTIONS; ++direction) {
@@ -94,6 +134,16 @@ void initializeAnswers(int *neighbours, int *positions, MPI_Request* answerReque
     }
 }
 
+/**
+ * Sum the surroundings of a point in a grid. (Ignores out of boundaries by not considering them in the sum)
+ * Also does not include the center point in the sum.
+ * @param subImage
+ * @param rows
+ * @param columns
+ * @param rowCenter
+ * @param columnCenter
+ * @return
+ */
 int summer(char** subImage, int rows, int columns, int rowCenter, int columnCenter) {
   int sum = 0;
   int i, j;
@@ -111,6 +161,19 @@ int summer(char** subImage, int rows, int columns, int rowCenter, int columnCent
   return sum;
 };
 
+/**
+ * Test all previously initialized answer requests from neighbours to current process.
+ * If any of them is finished (that neighbour asked something for the current process)
+ * then, calculate the relevant answer and create an answer response to send it to that neighbour,
+ * then, reinitialize that answer request for future questions.
+ * @param subImage
+ * @param rows
+ * @param columns
+ * @param neighbours
+ * @param positions
+ * @param answerRequests
+ * @param answerResponses
+ */
 void answerAll(char** subImage, int rows, int columns, int *neighbours, int *positions,
         MPI_Request* answerRequests, MPI_Request* answerResponses) {
     int position, direction, rowCenter, columnCenter;
@@ -168,6 +231,15 @@ void answerAll(char** subImage, int rows, int columns, int *neighbours, int *pos
 
 }
 
+/**
+ * Notify neighbours that the current process finished all of its iterations and it will terminate
+ * when all of its neighbours also finish their iterations.
+ * Also receive such information from its neighbours.
+ * @param neighbours
+ * @param finishedRequests
+ * @param finishedResponses
+ * @param finishedReqResCount
+ */
 void sendFinishedAll(int* neighbours, MPI_Request* finishedRequests, MPI_Request* finishedResponses, int *finishedReqResCount) {
     int direction;
     for (direction = 0; direction < DIRECTIONS; ++direction) {
@@ -179,6 +251,17 @@ void sendFinishedAll(int* neighbours, MPI_Request* finishedRequests, MPI_Request
     }
 };
 
+/**
+ * Check if all of the current process'es neighbours has finished their iterations.
+ *
+ * Use that function so that
+ * "If so, terminate the current process, otherwise keep waiting and answering neighbours"
+ * @param neighbours
+ * @param finishedRequests
+ * @param finishedResponses
+ * @param finishedReqResCount
+ * @return
+ */
 int testFinishedAll(int* neighbours, MPI_Request* finishedRequests, MPI_Request* finishedResponses, int *finishedReqResCount) {
     int requestResult = 1, responseResult = 1;
     if (*finishedReqResCount > 0) {
@@ -188,6 +271,18 @@ int testFinishedAll(int* neighbours, MPI_Request* finishedRequests, MPI_Request*
     return requestResult && responseResult;
 };
 
+/**
+ * Ask a question to a neighbour in the given position to calculate the sum for its portion of that position's center.
+ * This will create an ask request (MPI_Isend) to notify the neighbour and
+ * an ask response (MPI_Irecv) to get the result from the neighbour
+ * which will be available when the neighbour answers.
+ * @param neighbour
+ * @param position
+ * @param askRequests
+ * @param askReqResCount
+ * @param askResponses
+ * @param askResponseValues
+ */
 void askAsync(int neighbour, int position, MPI_Request* askRequests, int *askReqResCount,
         MPI_Request* askResponses, int* askResponseValues
     ) {
@@ -201,6 +296,13 @@ void askAsync(int neighbour, int position, MPI_Request* askRequests, int *askReq
     ++(*askReqResCount);
 }
 
+/**
+ * Check whether all ask requests & responses are finished by their neighbours so that the calculation can proceed.
+ * @param askRequests
+ * @param askReqResCount
+ * @param askResponses
+ * @return
+ */
 int testAskAll(MPI_Request* askRequests, int *askReqResCount, MPI_Request* askResponses) {
     int requestResult = 1, responseResult = 1;
     if (*askReqResCount > 0) {
@@ -210,6 +312,15 @@ int testAskAll(MPI_Request* askRequests, int *askReqResCount, MPI_Request* askRe
     return requestResult && responseResult;
 }
 
+/**
+ * Get the sum of all ask responses to use in the calculation process,
+ * also reduce the number of ask requests/responses back to zero
+ * @param askRequests
+ * @param askReqResCount
+ * @param askResponses
+ * @param askResponseValues
+ * @return
+ */
 int askResult(MPI_Request* askRequests, int *askReqResCount, MPI_Request* askResponses, int* askResponseValues) {
     // called after a success testAskAll all ask requests and responses so it's certain that they all did finish.
     int result = 0;
@@ -222,6 +333,15 @@ int askResult(MPI_Request* askRequests, int *askReqResCount, MPI_Request* askRes
     return result;
 }
 
+/**
+ * logic for slave request
+ *
+ * @param world_size
+ * @param world_rank
+ * @param beta
+ * @param gammaValue
+ * @return
+ */
 int slave(int world_size, int world_rank, double beta, double gammaValue) {
     int iterations = TOTAL_ITERATIONS / (world_size - 1);
 
@@ -241,7 +361,6 @@ int slave(int world_size, int world_rank, double beta, double gammaValue) {
         subImage[i] = (char*)malloc(columns * sizeof(char));
         memcpy(subImage[i], initialSubImage[i], columns);
     }
-    printf("hi from slave %d who finished reading\n", world_rank);
 
     MPI_Request askRequests[DIRECTIONS];
     MPI_Request askResponses[DIRECTIONS];
@@ -326,6 +445,16 @@ int slave(int world_size, int world_rank, double beta, double gammaValue) {
     return 0;
 }
 
+/**
+ * logic for master process
+ *
+ * @param world_size
+ * @param world_rank
+ * @param input
+ * @param output
+ * @param grid
+ * @return
+ */
 int master(int world_size, int world_rank, char* input, char* output, int grid) {
     FILE *inputFile, *outputFile;
     inputFile = fopen(input, "r");
@@ -422,7 +551,7 @@ int master(int world_size, int world_rank, char* input, char* output, int grid) 
         ++rowNumber;
     }
     freeQueue(rowQueue);
-    printf("let the slaves work now\n");
+    printf("All slaves received their input from master, and starting working.\n");
 
 
     char finalResult[rowCount][columnCount];
@@ -447,6 +576,12 @@ int master(int world_size, int world_rank, char* input, char* output, int grid) 
     return 0;
 }
 
+/**
+ * check arguments and start master/slave function depending on the current process rank.
+ * @param argc
+ * @param argv
+ * @return
+ */
 int main(int argc, char** argv) {
     // MPI INITIALIZATIONS
     MPI_Init(NULL, NULL);
